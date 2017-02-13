@@ -22,11 +22,6 @@ public final class UseCaseOperation<Request, Response>: BaseOperation where Requ
         didSet {
             self.finish()
             self.checkIfEnded()
-//            if let response = self.response {
-//                self.finish()
-//                self.executeCommons()
-//                self.end(&self.thens, response)
-//            }
         }
     }
     
@@ -34,11 +29,6 @@ public final class UseCaseOperation<Request, Response>: BaseOperation where Requ
         didSet {
             self.finish()
             self.checkIfEnded()
-//            if let error = self.error {
-//                self.finish()
-//                self.executeCommons()
-//                self.end(&self.catchs, error)
-//            }
         }
     }
     
