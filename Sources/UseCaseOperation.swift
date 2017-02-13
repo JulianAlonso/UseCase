@@ -7,3 +7,120 @@
 //
 
 import Foundation
+
+public final class UseCaseOperation<Request, Response>: BaseOperation where Request: UseCaseRequest, Response: UseCaseResponse {
+    
+    public typealias CommonBlock = () -> Void
+    public typealias ThenBlock = (Response) -> Void
+    public typealias CatchBlock = (Error) -> Void
+    
+    private var commons: [CommonBlock] = []
+    private var thens: [ThenBlock] = []
+    private var catchs: [CatchBlock] = []
+    
+    public var response: Response? {
+        didSet {
+            self.finish()
+            self.checkIfEnded()
+//            if let response = self.response {
+//                self.finish()
+//                self.executeCommons()
+//                self.end(&self.thens, response)
+//            }
+        }
+    }
+    
+    public var error: Error? {
+        didSet {
+            self.finish()
+            self.checkIfEnded()
+//            if let error = self.error {
+//                self.finish()
+//                self.executeCommons()
+//                self.end(&self.catchs, error)
+//            }
+        }
+    }
+    
+    let execution: (UseCaseOperation<Request, Response>) -> ()
+    
+    public init(execution: @escaping (UseCaseOperation<Request, Response>) -> ()) {
+        self.execution = execution
+    }
+    
+    override public func main() {
+        self.execution(self)
+    }
+    
+    @discardableResult public func common(_ common: @escaping CommonBlock) -> Self {
+        self.commons.append(common)
+        self.checkIfEnded()
+        return self
+    }
+    
+    @discardableResult public func then(_ then: @escaping ThenBlock) -> Self {
+        self.thens.append(then)
+        self.checkIfEnded()
+        return self
+    }
+    
+    @discardableResult public func `catch`(_ `catch`: @escaping CatchBlock) -> Self {
+        self.catchs.append(`catch`)
+        self.checkIfEnded()
+        return self
+    }
+    
+    private func end<T>(_ blocks: inout [(T) -> Void], _ with: T) {
+        print("End with \(with)")
+        while !blocks.isEmpty {
+            if let first = blocks.first {
+                DispatchQueue.main.async {
+                    first(with)
+                }
+                var newBlocks: [(T) -> Void] = []
+                for i in 0..<blocks.count {
+                    if i > 0 {
+                        newBlocks.append(blocks[i])
+                    }
+                }
+                blocks = newBlocks
+            }
+        }
+    }
+    
+    private func finish() {
+        if !self.isCancelled {
+            self.state = .Finished
+        }
+    }
+    
+    private func executeCommons() {
+        while !self.commons.isEmpty {
+            if let first = commons.first {
+                DispatchQueue.main.async {
+                    first()
+                }
+                var newBlocks: [CommonBlock] = []
+                for i in 0..<self.commons.count {
+                    if i > 0 {
+                        newBlocks.append(self.commons[i])
+                    }
+                }
+                self.commons = newBlocks
+            }
+        }
+    }
+    
+    private func checkIfEnded() {
+        if self.isCancelled { return }
+        if let response = self.response {
+            self.executeCommons()
+            self.end(&self.thens, response)
+        }
+        if let error = self.error {
+            self.executeCommons()
+            self.end(&self.catchs, error)
+        }
+    }
+    
+}
