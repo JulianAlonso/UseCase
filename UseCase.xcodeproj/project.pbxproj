@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		27CC3A801E52041100C68C9F /* UseCase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27CC3A761E52041100C68C9F /* UseCase.framework */; };
-		27CC3A981E52054800C68C9F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 27CC3A961E52054800C68C9F /* Info.plist */; };
 		27CC3A991E52054800C68C9F /* UseCase.h in Headers */ = {isa = PBXBuildFile; fileRef = 27CC3A971E52054800C68C9F /* UseCase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27CC3A9B1E52058300C68C9F /* UseCaseOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CC3A9A1E52058300C68C9F /* UseCaseOperation.swift */; };
 		27CC3A9D1E52058D00C68C9F /* UseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CC3A9C1E52058D00C68C9F /* UseCase.swift */; };
@@ -253,7 +252,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27CC3A981E52054800C68C9F /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
