@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
                        It use apple operations framework to execute your use case `main` code.
                        DESC
 
-  s.homepage         = "https://github.com/julianalonso/Jalver"
+  s.homepage         = "https://github.com/julianalonso/UseCase"
   s.license          = 'MIT'
   s.author           = { "Julian Alonso" => "julian.alonso.dev@gmail.com" }
   s.source           = { :git => "https://github.com/julianalonso/UseCase.git", :tag => s.version.to_s }
