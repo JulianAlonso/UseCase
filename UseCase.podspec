@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "UseCase"
-  s.version          = "1.0.1"
+  s.version          = "1.0.2"
   s.summary          = "UseCase Base class to use .then, .catch"
   s.ios.deployment_target = '9.0'
   s.description      = <<-DESC
