@@ -100,8 +100,18 @@ public final class UseCaseOperation<Request, Response>: BaseOperation where Requ
         }
     }
     
+    private func clear() {
+        self.commons = []
+        self.thens = []
+        self.catchs = []
+    }
+    
     private func checkIfEnded() {
-        if self.isCancelled { return }
+        if self.isCancelled {
+            self.clear()
+            self.state = .Finished
+            return
+        }
         if let response = self.response {
             self.executeCommons()
             self.end(&self.thens, response)

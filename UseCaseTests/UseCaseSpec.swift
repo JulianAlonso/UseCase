@@ -29,6 +29,7 @@ final class UseCaseSpec: QuickSpec {
                 waitUntil { done in
                     useCase.execute(TestRequest()).then { response in
                         expect(response).toNot(beNil())
+                        print("Operation count: \(self.queue.operationCount)")
                         done()
                     }
                     .catch { (error) in
@@ -133,18 +134,19 @@ final class UseCaseSpec: QuickSpec {
             
             describe("Use case works under operations then operation: ") {
                 
-                it("Must be finished when then is executed") {
+                it("Must be finished when then is executed and queue count must be 0") {
                     waitUntil { done in
                         var operation: Operation?
                         operation = useCase.execute(TestRequest()).then { response in
                             expect(operation).toNot(beNil())
                             expect(operation?.isFinished).to(beTrue())
+                            expect(self.queue.operationCount).to(equal(0))
                             done()
                         }
                     }
                 }
                 
-                it("When it's cancelled, nothing must be executed") {
+                it("When it's cancelled, nothing must be executed and queue count must be 0") {
                     waitUntil(timeout: 2) { done in
                         var operation: Operation?
                         operation = useCase.execute(TestRequest()).common {
@@ -158,6 +160,7 @@ final class UseCaseSpec: QuickSpec {
                         }
                         operation?.cancel()
                         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+                            expect(self.queue.operationCount).to(equal(0))
                             done()
                         }
                     }
