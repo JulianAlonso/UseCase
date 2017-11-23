@@ -18,6 +18,8 @@ public final class UseCaseOperation<Request, Response>: BaseOperation where Requ
     private var thens: [ThenBlock] = []
     private var catchs: [CatchBlock] = []
     
+    private let queue = DispatchQueue(label: "UseCaseOperationQueue")
+    
     public var response: Response? {
         didSet {
             self.finish()
@@ -43,36 +45,44 @@ public final class UseCaseOperation<Request, Response>: BaseOperation where Requ
     }
     
     @discardableResult public func common(_ common: @escaping CommonBlock) -> Self {
-        self.commons.append(common)
-        self.checkIfEnded()
+        self.queue.sync {
+            self.commons.append(common)
+            self.checkIfEnded()
+        }
         return self
     }
     
     @discardableResult public func then(_ then: @escaping ThenBlock) -> Self {
-        self.thens.append(then)
-        self.checkIfEnded()
+        self.queue.sync {
+            self.thens.append(then)
+            self.checkIfEnded()
+        }
         return self
     }
     
     @discardableResult public func `catch`(_ `catch`: @escaping CatchBlock) -> Self {
-        self.catchs.append(`catch`)
-        self.checkIfEnded()
+        self.queue.sync {
+            self.catchs.append(`catch`)
+            self.checkIfEnded()
+        }
         return self
     }
     
     private func end<T>(_ blocks: inout [(T) -> Void], _ with: T) {
-        while !blocks.isEmpty {
-            if let first = blocks.first {
-                DispatchQueue.main.async {
-                    first(with)
-                }
-                var newBlocks: [(T) -> Void] = []
-                for i in 0..<blocks.count {
-                    if i > 0 {
-                        newBlocks.append(blocks[i])
+        self.queue.sync {
+            while !blocks.isEmpty {
+                if let first = blocks.first {
+                    DispatchQueue.main.async {
+                        first(with)
                     }
+                    var newBlocks: [(T) -> Void] = []
+                    for i in 0..<blocks.count {
+                        if i > 0 {
+                            newBlocks.append(blocks[i])
+                        }
+                    }
+                    blocks = newBlocks
                 }
-                blocks = newBlocks
             }
         }
     }
@@ -84,18 +94,20 @@ public final class UseCaseOperation<Request, Response>: BaseOperation where Requ
     }
     
     private func executeCommons() {
-        while !self.commons.isEmpty {
-            if let first = commons.first {
-                DispatchQueue.main.async {
-                    first()
-                }
-                var newBlocks: [CommonBlock] = []
-                for i in 0..<self.commons.count {
-                    if i > 0 {
-                        newBlocks.append(self.commons[i])
+        self.queue.sync {
+            while !self.commons.isEmpty {
+                if let first = commons.first {
+                    DispatchQueue.main.async {
+                        first()
                     }
+                    var newBlocks: [CommonBlock] = []
+                    for i in 0..<self.commons.count {
+                        if i > 0 {
+                            newBlocks.append(self.commons[i])
+                        }
+                    }
+                    self.commons = newBlocks
                 }
-                self.commons = newBlocks
             }
         }
     }
