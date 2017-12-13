@@ -16,7 +16,7 @@ public protocol UseCaseResponse {
     
 }
 
-open class UseCase<Request, Response> where Response: UseCaseResponse, Request: UseCaseRequest {
+open class UseCase<Request, Response> {
     
     let queue: OperationQueue
     
@@ -24,7 +24,7 @@ open class UseCase<Request, Response> where Response: UseCaseResponse, Request: 
         self.queue = queue
     }
     
-    public func execute(_ request: Request?) -> UseCaseOperation<Request, Response> {
+    public func execute(_ request: Request? = nil) -> UseCaseOperation<Request, Response> {
         let operation = UseCaseOperation<Request,Response> { self.main(request: request, $0) }
         self.queue.addOperation(operation)
         return operation

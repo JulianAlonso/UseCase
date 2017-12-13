@@ -168,6 +168,65 @@ final class UseCaseSpec: QuickSpec {
                 
             }
             
+            
+            describe("FIX BUG: Use case have a deadlock when calling method#executeCommons when add a common, then, chatch block and operation is actually ended") {
+                /**
+                 OLD CODE
+                 @discardableResult public func then(_ then: @escaping ThenBlock) -> Self {
+                    self.queue.sync {
+                        self.thens.append(then)
+                        self.checkIfEnded()
+                    }
+                    return self
+                 }
+                 NEW CODE - RESOLVES THE DEADLOCK
+                 @discardableResult public func then(_ then: @escaping ThenBlock) -> Self {
+                     self.queue.sync {
+                         self.thens.append(then)
+                     }
+                     self.checkIfEnded()
+                     return self
+                 }
+                */
+                it("Dont must fail") {
+                    let usecase = TestDeadlockUseCase(self.queue)
+                    waitUntil(timeout: 3) { done in
+                        var commonCount = 0
+                        var thenCount = 0
+                        
+                        let operation = usecase.execute(nil).common {
+                            commonCount += 1
+                        }.common {
+                            commonCount += 1
+                        }.common {
+                            commonCount += 1
+                        }.then { response in
+                            thenCount += 1
+                        }.then{ response in
+                            thenCount += 1
+                        }.then { response in
+                            thenCount += 1
+                        }.then { response in
+                            thenCount += 1
+                        }
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+                            operation.common {
+                                commonCount += 1
+                            }.then { response in
+                                //
+                            }
+                        }
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
+                            expect(commonCount).to(equal(4))
+                            expect(thenCount).to(equal(4))
+                            done()
+                        }
+                    }
+                }
+            }
+            
         }
         
     }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public final class UseCaseOperation<Request, Response>: BaseOperation where Request: UseCaseRequest, Response: UseCaseResponse {
+public final class UseCaseOperation<Request, Response>: BaseOperation {
     
     public typealias CommonBlock = () -> Void
     public typealias ThenBlock = (Response) -> Void
@@ -47,24 +47,24 @@ public final class UseCaseOperation<Request, Response>: BaseOperation where Requ
     @discardableResult public func common(_ common: @escaping CommonBlock) -> Self {
         self.queue.sync {
             self.commons.append(common)
-            self.checkIfEnded()
         }
+        self.checkIfEnded()
         return self
     }
     
     @discardableResult public func then(_ then: @escaping ThenBlock) -> Self {
         self.queue.sync {
             self.thens.append(then)
-            self.checkIfEnded()
         }
+        self.checkIfEnded()
         return self
     }
     
     @discardableResult public func `catch`(_ `catch`: @escaping CatchBlock) -> Self {
         self.queue.sync {
             self.catchs.append(`catch`)
-            self.checkIfEnded()
         }
+        self.checkIfEnded()
         return self
     }
     

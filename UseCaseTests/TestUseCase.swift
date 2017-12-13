@@ -8,11 +8,11 @@
 
 import Foundation
 
-struct TestRequest: UseCaseRequest {
+struct TestRequest {
     
 }
 
-struct TestResponse: UseCaseResponse {
+struct TestResponse {
     
 }
 
@@ -30,6 +30,14 @@ final class TestUseCase: UseCase<TestRequest, TestResponse> {
                 operation.error = TestError.noRequest
             }
         }
+    }
+    
+}
+
+final class TestDeadlockUseCase: UseCase<TestRequest, TestResponse> {
+    
+    override func main(request: TestRequest?, _ operation: UseCaseOperation<TestRequest, TestResponse>) {
+        operation.response = TestResponse()
     }
     
 }
