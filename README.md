@@ -3,13 +3,13 @@ UseCase
 
 Use case library.
 
-Use case base class to use `.then` and `.catch` after execute.
+Use case base class to use `.common` `.then` and `.catch` after execute.
 
 Any use case subclass must be initialized with a **OperationQueue**.
 This class executes the code under an **Operation**, this means that UseCase can be suspended, or cancelled.
 
 ## How use it.
-Create a class or struct implementing UseCaseRequest and other UseCaseResponse
+Create a class or struct for the request and the response.
 
 Then create a subclass of UseCase<Request, Response> with yours UseCaseRequest and UseCaseResponse.
 Override the main method, this receives a operation object. When your code finish, set operation.response or operation.error to end the execution of your code.
@@ -18,11 +18,11 @@ Override the main method, this receives a operation object. When your code finis
 
 ```swift
 
-struct TestRequest: UseCaseRequest {
+struct TestRequest {
 
 }
 
-struct TestResponse: UseCaseResponse {
+struct TestResponse {
 
 }
 
@@ -45,7 +45,8 @@ final class TestUseCase: UseCase<TestRequest, TestResponse> {
 }
 
 //Using TestUseCase:
-useCase.execute(TestRequest()).common {
+useCase.execute()
+.common {
     print("Im finished.")
 }
 .then { response in
@@ -60,7 +61,7 @@ useCase.execute(TestRequest()).common {
 ```
 
 ## Contributing:
-If you find and issue, please, write a test that reproduce it and notificate me by github issues.
+If you find and issue, please, write a test that reproduce it and notify me by github issues.
 If you have some idea about how to improve it, fork it, write your code, test it and send me a pull request.
 
 ## Developed by:
